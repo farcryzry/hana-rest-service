@@ -9,10 +9,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Root resource (exposed at "myresource" path)
+ * Root resource (exposed at "pal" path)
  */
-@Path("myresource")
-public class MyResource {
+@Path("pal")
+public class PalResource {
 
 	/**
 	 * Method handling HTTP GET requests. The returned object will be sent to
@@ -20,17 +20,15 @@ public class MyResource {
 	 * 
 	 * @return String that will be returned as a text/plain response.
 	 */
-	@Path("query/{table}")
+	@Path("query/table/{table}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getIt(@PathParam("table") String tableName) {
-		// return new Greeting(12121,"aa");
-		// AnalysisResult result = Pal.runKmeans();
-		// return result;
+	public String query(@PathParam("table") String tableName) {
+
 		String result = "";
 
 		try {
-			result = Pal.Query(tableName);
+			result = PalService.Query(tableName);
 		} catch (Exception e) {
 			result = e.getMessage();
 		}
@@ -42,6 +40,6 @@ public class MyResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public AnalysisResult kmeans() {
-		return Pal.runKmeans();
+		return PalService.runKmeans(false);
 	}
 }
