@@ -50,6 +50,13 @@ public class PalResource {
 		return PalService.runNaiveBayes(true);
 	}
 	
+	@Path("nbpredict")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult nbpredict() {
+		return PalService.runNaiveBayesPrediction(true);
+	}
+	
 	@Path("test")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
