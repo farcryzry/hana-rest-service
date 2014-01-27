@@ -34,6 +34,28 @@ public class PalService {
 		
 		return result;
 	}
+	
+	public static AnalysisResult runNaiveBayes(boolean reGenerate) {
+
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("POLICY", "VARCHAR(10)");
+		columns.put("AGE", "INTEGER");
+		columns.put("AMOUNT", "INTEGER");
+		columns.put("OCCUPATION", "VARCHAR(10)");
+		columns.put("FRAUD", "VARCHAR(10)");
+
+		String viewDef = "SELECT POLICY, AGE, AMOUNT, OCCUPATION, FRAUD FROM PAL.CLAIMS";
+		
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 1);
+		params.put("IS_SPLIT_MODEL", 0);
+		params.put("LAPLACE", 0.01);
+		
+		AnalysisResult result = Pal.naiveBayes(reGenerate, "PAL", "CLAIMS", columns, viewDef, params);
+		System.out.println(result);
+		
+		return result;
+	}
 
 	public static String Query(String tableName) {
 		Connector c = new Connector();

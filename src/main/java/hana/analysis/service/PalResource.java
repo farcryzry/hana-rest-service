@@ -42,4 +42,19 @@ public class PalResource {
 	public AnalysisResult kmeans() {
 		return PalService.runKmeans(false);
 	}
+	
+	@Path("naivebayes")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult naivebayes() {
+		return PalService.runNaiveBayes(true);
+	}
+	
+	@Path("test")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public String []  test() {
+
+		return new String [] {"111", "222", "333"};
+	}
 }
