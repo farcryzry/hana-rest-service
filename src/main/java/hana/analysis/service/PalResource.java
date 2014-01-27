@@ -13,6 +13,14 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("pal")
 public class PalResource {
+	
+	@Path("test")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public String []  test() {
+
+		return new String [] {"111", "222", "333"};
+	}
 
 	/**
 	 * Method handling HTTP GET requests. The returned object will be sent to
@@ -57,11 +65,17 @@ public class PalResource {
 		return PalService.runNaiveBayesPrediction(true);
 	}
 	
-	@Path("test")
+	@Path("svm")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public String []  test() {
-
-		return new String [] {"111", "222", "333"};
+	public AnalysisResult svm() {
+		return PalService.runSupportVectorMachine(true);
+	}
+	
+	@Path("svmpredict")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult svmpredict() {
+		return PalService.runSupportVectorMachinePrediction(true);
 	}
 }
