@@ -48,7 +48,7 @@ public class PalResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public AnalysisResult kmeans() {
-		return PalService.runKmeans(false);
+		return PalService.runKmeans(true);
 	}
 	
 	@Path("naivebayes")
@@ -77,5 +77,12 @@ public class PalResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AnalysisResult svmpredict() {
 		return PalService.runSupportVectorMachinePrediction(true);
+	}
+	
+	@Path("knn")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult knn() {
+		return PalService.runKnn(true);
 	}
 }

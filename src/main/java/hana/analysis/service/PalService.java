@@ -154,4 +154,42 @@ public class PalService {
 
 		return result;
 	}
+
+	public static AnalysisResult runKnn(boolean reGenerate) {
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("CUSTOMER_ID", "INTEGER");
+		columns.put("GENDER", "INTEGER");
+		columns.put("LIFESPEND", "INTEGER");
+		columns.put("NEWSPEND", "INTEGER");
+
+		List<List<Object>> classData = new ArrayList<List<Object>>();
+		classData.add(Arrays.asList(new Object[] { 1, 3020, 1300 }));
+		classData.add(Arrays.asList(new Object[] { 2, 5300, 980 }));
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 4);
+		params.put("ATTRIBUTE_NUM", 2);
+		params.put("K_NEAREST_NEIGHBOURS", 3);
+		params.put("VOTING_TYPE", 0);
+		params.put("METHOD", 0);
+
+		String viewDef = "SELECT c.CUSTOMER_ID, c.CUSTOMER_GENDER_ID AS GENDER, l.LIFESPEND, n.NEWSPEND FROM PAL.CUSTOMER c"
+				+ " INNER JOIN ("
+				+ " SELECT CUSTOMER_ID, SUM(SALES_AMOUNT) AS LIFESPEND"
+				+ " FROM PAL.ORDER_FACTS"
+				+ " GROUP BY CUSTOMER_ID"
+				+ " ) l ON(c.CUSTOMER_ID = l.CUSTOMER_ID)"
+				+ " INNER JOIN ("
+				+ " SELECT CUSTOMER_ID, SUM(SALES_AMOUNT) AS NEWSPEND"
+				+ " FROM PAL.ORDER_FACTS"
+				+ " WHERE CALENDAR_ID=23"
+				+ " GROUP BY CUSTOMER_ID"
+				+ " ) n ON(c.CUSTOMER_ID = n.CUSTOMER_ID)";
+
+		AnalysisResult result = Pal.kNearestNeighbor(reGenerate, "PAL",
+				"SVP_DATA", columns, viewDef, "PAL.KNN_CLASS", classData, params);
+		System.out.println(result);
+
+		return result;
+	}
 }
