@@ -14,6 +14,9 @@
     	<li><a href="webapi/pal/nbpredict" target="_blank">Naive Bayes Prediction</a></li>
     	<li><a href="##webapi/pal/svm" target="_blank">Suppor Vector Machine Training (not ready)</a></li>
     	<li><a href="##webapi/pal/svmpredict" target="_blank">Suppor Vector Machine Prediction (not ready)</a></li>
+    	<li><a href="webapi/pal/lr" target="_blank">Logistic Regression Training</a></li>
+    	<li><a href="webapi/pal/lrpredict" target="_blank">Logistic Regression Prediction</a></li>
+    	<li></li><li></li>
     	<li><a href="webapi/pal/query/table/xxx" target="_blank">Query Table Records (replace xxx with the table name, such as PAL.KMEANSRESULT1)</a></li>
     </ul>
 </body>

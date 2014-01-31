@@ -187,9 +187,65 @@ public class PalService {
 				+ " ) n ON(c.CUSTOMER_ID = n.CUSTOMER_ID)";
 
 		AnalysisResult result = Pal.kNearestNeighbor(reGenerate, "PAL",
-				"SVP_DATA", columns, viewDef, "PAL.KNN_CLASS", classData, params);
+				"SVP_DATA", columns, viewDef, "PAL.KNN_CLASS", classData,
+				params);
 		System.out.println(result);
 
 		return result;
 	}
+
+	public static AnalysisResult runLogisticRegression(boolean reGenerate) {
+
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("LIFESPEND", "INTEGER");
+		columns.put("GENDER", "INTEGER");
+
+		String viewDef = "SELECT TOP 1000 l.LIFESPEND, c.CUSTOMER_GENDER_ID AS GENDER"
+				+ " FROM PAL.CUSTOMER c"
+				+ " INNER JOIN ("
+				+ " SELECT CUSTOMER_ID, SUM(SALES_AMOUNT) AS LIFESPEND"
+				+ " FROM PAL.ORDER_FACTS"
+				+ " GROUP BY CUSTOMER_ID"
+				+ " ) l ON(c.CUSTOMER_ID = l.CUSTOMER_ID)";
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 4);
+		params.put("MAX_ITERATION", 100);
+		params.put("EXIT_THRESHOLD", 0.00001);
+		params.put("VARIABLE_NUM", 1);
+		params.put("METHOD", 0);
+		params.put("PMML_EXPORT", 2);
+
+		AnalysisResult result = Pal.logisticRegression(reGenerate, "PAL",
+				"CUSTOMER", columns, viewDef, params);
+		System.out.println(result);
+
+		return result;
+	}
+
+	public static AnalysisResult runLogisticRegressionPrediction(
+			boolean reGenerate) {
+
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("ID", "INTEGER");
+		columns.put("LIFESPEND", "INTEGER");
+
+		List<List<Object>> data = new ArrayList<List<Object>>();
+		data.add(Arrays.asList(new Object[] { 1, 3000 }));
+		data.add(Arrays.asList(new Object[] { 2, 5000 }));
+		data.add(Arrays.asList(new Object[] { 3, 9000 }));
+		data.add(Arrays.asList(new Object[] { 4, 12000 }));
+		data.add(Arrays.asList(new Object[] { 5, 14000 }));
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 2);
+
+		AnalysisResult result = Pal.logisticRegressionPredict(reGenerate, "PAL",
+				"RGP_PREDICT", columns, data, "PAL.LOGISTICREGRESSIONRESULT1",
+				params);
+		System.out.println(result);
+
+		return result;
+	}
+
 }

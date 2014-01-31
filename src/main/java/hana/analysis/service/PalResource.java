@@ -85,4 +85,18 @@ public class PalResource {
 	public AnalysisResult knn() {
 		return PalService.runKnn(true);
 	}
+	
+	@Path("lr")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult lr() {
+		return PalService.runLogisticRegression(true);
+	}
+	
+	@Path("lrpredict")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnalysisResult lrpredict() {
+		return PalService.runLogisticRegressionPrediction(true);
+	}
 }
