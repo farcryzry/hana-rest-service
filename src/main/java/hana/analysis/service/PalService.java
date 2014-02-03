@@ -3,6 +3,7 @@ package hana.analysis.service;
 import hana.analysis.api.Pal;
 import hana.analysis.db.Connector;
 import hana.analysis.models.AnalysisResult;
+import hana.analysis.models.ResultSetModel;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,17 +11,23 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public class PalService {
 
-	public static String Query(String tableName) {
+	public static ResultSetModel Query(String sql) {
 		Connector c = new Connector();
 		try {
-			String s = c.Query(String.format("select * from %s", tableName));
+			ResultSetModel s = c.Query(sql);
 			return s;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static ResultSetModel QueryTable(String tableName) {
+		return Query(String.format("select * from %s", tableName));
 	}
 
 	public static AnalysisResult runKmeans(boolean reGenerate) {
@@ -240,12 +247,72 @@ public class PalService {
 		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 		params.put("THREAD_NUMBER", 2);
 
-		AnalysisResult result = Pal.logisticRegressionPredict(reGenerate, "PAL",
-				"RGP_PREDICT", columns, data, "PAL.LOGISTICREGRESSIONRESULT1",
-				params);
+		AnalysisResult result = Pal.logisticRegressionPredict(reGenerate,
+				"PAL", "RGP_PREDICT", columns, data,
+				"PAL.LOGISTICREGRESSIONRESULT1", params);
 		System.out.println(result);
 
 		return result;
+	}
+
+	public static AnalysisResult runMultipleLinearRegression(boolean reGenerate) {
+
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("ID", "INTEGER");
+		columns.put("LIFESPEND", "DOUBLE");
+		columns.put("INCOME", "DOUBLE");
+		columns.put("LOYALTY", "DOUBLE");
+		columns.put("NEWSPEND", "DOUBLE");
+
+		String viewDef = "SELECT ID, LIFESPEND, INCOME, LOYALTY, NEWSPEND FROM PAL.CUSTOMERS";
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 2);
+		params.put("VARIABLE_NUM", 3);
+		params.put("PMML_EXPORT", 2);
+
+		AnalysisResult result = Pal.multipleLinearRegression(reGenerate, "PAL",
+				"CUSTOMER", columns, viewDef, params);
+		System.out.println(result);
+
+		return result;
+	}
+
+	public static PredictOutputModel runMultipleLinearRegressionPrediction(
+			boolean reGenerate) {
+
+		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+		columns.put("ID", "INTEGER");
+		columns.put("INCOME", "DOUBLE");
+		columns.put("LOYALTY", "DOUBLE");
+		columns.put("NEWSPEND", "DOUBLE");
+
+		List<List<Object>> data = new ArrayList<List<Object>>();
+		data.add(Arrays.asList(new Object[] { 151, 2.5, 3.1, 4.5 }));
+		data.add(Arrays.asList(new Object[] { 152, 7.5, 4.2, 7.6 }));
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		params.put("THREAD_NUMBER", 2);
+
+		AnalysisResult result = Pal.multipleLinearRegressionPredict(reGenerate,
+				"PAL", "MLRGP_PREDICT", columns, data,
+				"PAL.LRREGRESSIONRESULT1", params);
+		System.out.println(result);
+
+		String sqlInput = "SELECT ID, LIFESPEND, INCOME, LOYALTY, NEWSPEND FROM PAL.CUSTOMERS";
+		String sqlPredict = "SELECT"
+				+ " CASE WHEN a.ID IS NOT NULL THEN a.ID ELSE b.ID END AS ID, "
+				+ " CASE WHEN a.LIFESPEND IS NOT NULL THEN a.LIFESPEND ELSE ROUND(b.FITTED,1) END AS LIFESPEND, "
+				+ " CASE WHEN a.INCOME IS NOT NULL THEN a.INCOME ELSE c.INCOME END AS INCOME,"
+				+ " CASE WHEN a.LOYALTY IS NOT NULL THEN a.LOYALTY ELSE c.LOYALTY END AS LOYALTY,"
+				+ " CASE WHEN a.NEWSPEND IS NOT NULL THEN a.NEWSPEND ELSE c.NEWSPEND END AS NEWSPEND"
+				+ " FROM PAL.CUSTOMERS a "
+				+ " FULL JOIN PAL.FORECASTWITHLRRESULT1 b ON (a.ID=b.ID)"
+				+ " FULL JOIN PAL.MLRGP_PREDICT c ON (b.ID=c.ID)";
+		PredictOutputModel predictOutputModel = new PredictOutputModel(result,
+				sqlInput, sqlPredict);
+
+		return predictOutputModel;
 	}
 
 }
