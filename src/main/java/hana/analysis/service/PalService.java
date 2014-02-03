@@ -255,7 +255,8 @@ public class PalService {
 		return result;
 	}
 
-	public static AnalysisResult runMultipleLinearRegression(boolean reGenerate) {
+	public static AnalysisResult runMultipleLinearRegression(
+			boolean reGenerate, int variableNum, int pmmlExport) {
 
 		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
 		columns.put("ID", "INTEGER");
@@ -268,11 +269,11 @@ public class PalService {
 
 		LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
 		params.put("THREAD_NUMBER", 2);
-		params.put("VARIABLE_NUM", 3);
-		params.put("PMML_EXPORT", 2);
+		params.put("VARIABLE_NUM", variableNum <= 0 ? 3 : variableNum);
+		params.put("PMML_EXPORT", pmmlExport <= 0 ? 2 : pmmlExport);
 
 		AnalysisResult result = Pal.multipleLinearRegression(reGenerate, "PAL",
-				"CUSTOMER", columns, viewDef, params);
+				"CUSTOMERS", columns, viewDef, params);
 		System.out.println(result);
 
 		return result;
@@ -300,15 +301,9 @@ public class PalService {
 		System.out.println(result);
 
 		String sqlInput = "SELECT ID, LIFESPEND, INCOME, LOYALTY, NEWSPEND FROM PAL.CUSTOMERS";
-		String sqlPredict = "SELECT"
-				+ " CASE WHEN a.ID IS NOT NULL THEN a.ID ELSE b.ID END AS ID, "
-				+ " CASE WHEN a.LIFESPEND IS NOT NULL THEN a.LIFESPEND ELSE ROUND(b.FITTED,1) END AS LIFESPEND, "
-				+ " CASE WHEN a.INCOME IS NOT NULL THEN a.INCOME ELSE c.INCOME END AS INCOME,"
-				+ " CASE WHEN a.LOYALTY IS NOT NULL THEN a.LOYALTY ELSE c.LOYALTY END AS LOYALTY,"
-				+ " CASE WHEN a.NEWSPEND IS NOT NULL THEN a.NEWSPEND ELSE c.NEWSPEND END AS NEWSPEND"
-				+ " FROM PAL.CUSTOMERS a "
-				+ " FULL JOIN PAL.FORECASTWITHLRRESULT1 b ON (a.ID=b.ID)"
-				+ " FULL JOIN PAL.MLRGP_PREDICT c ON (b.ID=c.ID)";
+		String sqlPredict = "SELECT a.ID, ROUND(a.FITTED,1) AS LIFESPEND, "
+				+ " b.INCOME, b.LOYALTY, b.NEWSPEND FROM PAL.FORECASTWITHLRRESULT1 a "
+				+ " INNER JOIN PAL.MLRGP_PREDICT b ON (a.ID=b.ID)";
 		PredictOutputModel predictOutputModel = new PredictOutputModel(result,
 				sqlInput, sqlPredict);
 

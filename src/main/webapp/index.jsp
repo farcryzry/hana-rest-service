@@ -22,7 +22,8 @@
     	<li><a href="webapi/pal/lr" target="_blank">Logistic Regression Training</a></li>
     	<li><a href="webapi/pal/lrpredict" target="_blank">Logistic Regression Prediction</a></li>
     	<li></li>
-    	<li><a href="webapi/pal/mlr" target="_blank">Multiple Linear Regression Modeling</a></li>
+    	<li><a href="##webapi/pal/mlr" target="_blank">Multiple Linear Regression Modeling (use Multiple Linear Regression Prediction)</a></li>
+    	<li><a href="webapi/pal/mlrpredict_meta" target="_blank">Multiple Linear Regression Metadata</a></li>
     	<li><a href="webapi/pal/mlrpredict" target="_blank">Multiple Linear Regression Prediction</a></li>
     	<li></li><li></li>
     	<li><a href="webapi/pal/query/table/xxx" target="_blank">Query Table Records (replace xxx with the table name, such as PAL.KMEANSRESULT1)</a></li>

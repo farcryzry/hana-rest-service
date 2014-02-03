@@ -1,12 +1,14 @@
 package hana.analysis.service;
 
-import hana.analysis.models.AnalysisResult;
-import hana.analysis.models.ResultSetModel;
+import java.util.List;
+
+import hana.analysis.models.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -18,9 +20,9 @@ public class PalResource {
 	@Path("test")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public String []  test() {
+	public String []  test(@QueryParam("p1") String p1) {
 
-		return new String [] {"111", "222", "333"};
+		return new String [] {p1 != null ? p1 : "111", "222", "333"};
 	}
 
 	/**
@@ -117,17 +119,28 @@ public class PalResource {
 		return PalService.runLogisticRegressionPrediction(false);
 	}
 	
+	/*
 	@Path("mlr")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public AnalysisResult mlr() {
-		return PalService.runMultipleLinearRegression(false);
+		return PalService.runMultipleLinearRegression(false, 3, 2);
+	}
+	*/
+	
+	@Path("mlrpredict_meta")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AlgorithmParameter> mlrpredictMeta() {
+		Algorithm mlrAlgorithm = new MlrAlgorithm();
+		return mlrAlgorithm.getParams();
 	}
 	
 	@Path("mlrpredict")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public PredictOutputModel mlrpredict() {
-		return PalService.runMultipleLinearRegressionPrediction(false);
+	public PredictOutputModel mlrpredict(@QueryParam("reGenerate") boolean reGenerate, @QueryParam("VARIABLE_NUM")int variableNum, @QueryParam("PMML_EXPORT")int pmmlExport) {
+		PalService.runMultipleLinearRegression(reGenerate, variableNum, pmmlExport);
+		return PalService.runMultipleLinearRegressionPrediction(reGenerate);
 	}
 }
